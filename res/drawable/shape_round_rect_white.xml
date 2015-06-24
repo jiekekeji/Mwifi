@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- android:shape="rectangle"  有四种选择： ovil 椭圆、 line 横线、 ring 环形 、rectangle 矩形 -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle" >
+
+    <!-- gradient 实体显示的颜色梯度，默认是透明 .依次开始 ，中间， 结束 一个渐变的的过程 -->
+    <gradient
+        android:angle="90"
+        android:endColor="#00000000"
+        android:startColor="#00000000" />
+
+    <!-- 定义圆角 -->
+    <corners
+        android:bottomLeftRadius="12dp"
+        android:bottomRightRadius="12dp"
+        android:topLeftRadius="12dp"
+        android:topRightRadius="12dp" />
+
+    <!-- 定义圆角的边框颜色值 -->
+    <stroke
+        android:width="1dip"
+        android:color="@color/white" />
+
+    <!-- 定义实心颜色，也就是填充颜色值 -->
+    <solid android:color="@color/white" />
+
+    <!-- 定义内容离边界的距离 -->
+    <padding
+        android:bottom="10dp"
+        android:left="10dp"
+        android:right="10dp"
+        android:top="10dp" />
+
+</shape>
