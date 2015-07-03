@@ -8,6 +8,7 @@ import java.util.List;
 
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiManager;
+import android.util.Log;
 
 public class WifiConnect {
 
@@ -15,7 +16,7 @@ public class WifiConnect {
 
 	// 定义几种加密方式，一种是WEP，一种是WPA，还有没有密码的情况
 	public enum WifiCipherType {
-		WIFICIPHER_WEP, WIFICIPHER_WPA, WIFICIPHER_NOPASS, WIFICIPHER_INVALID
+		WIFICIPHER_WEP, WIFICIPHER_WPA, WIFICIPHER_NOPASS, WIFICIPHER_INVALID, WIFICIPHER_WPA2
 	}
 
 	// 构造函数
@@ -54,6 +55,7 @@ public class WifiConnect {
 		}
 
 		int netID = mWifiManager.addNetwork(wifiConfig);
+		Log.i("TAG", netID + "");
 		return mWifiManager.enableNetwork(netID, true);
 	}
 
@@ -96,6 +98,7 @@ public class WifiConnect {
 			config.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.NONE);
 			config.wepTxKeyIndex = 0;
 		}
+
 		if (Type == WifiCipherType.WIFICIPHER_WPA) {
 			config.preSharedKey = "\"" + Password + "\"";
 			config.hiddenSSID = true;

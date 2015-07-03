@@ -12,9 +12,11 @@ import android.net.NetworkInfo;
 import android.net.wifi.ScanResult;
 import android.util.Log;
 
+import com.jk.mwifi.utils.SPUtils;
 import com.jk.mwifi.wifi.WifiAdmin;
 import com.jk.mwifi.wifi.WifiConnect;
 import com.jk.mwifi.wifi.WifiConnect.WifiCipherType;
+import com.jk.mywifi.custome.dialog.WifiConnDialog;
 
 /**
  * 检测附近的wifi热点
@@ -26,13 +28,13 @@ public class CheckApService extends IntentService {
 
 	public static final String TAG = CheckApService.class.getSimpleName();
 
-	private boolean isStop = false;
+	public static boolean isStop = false;
 
-	private static final String SPECIFY_SSID = "wanheng";
+	public static String SPECIFY_SSID;
 
-	private static final String SPECIFY_PWD = "WANHENGTECH755";
+	public static String SPECIFY_PWD;
 
-	private static final WifiCipherType SPECIFY_TYPE = WifiConnect.WifiCipherType.WIFICIPHER_WPA;
+	public static WifiCipherType SPECIFY_TYPE;
 
 	// Wifi管理类
 	private WifiAdmin mWifiAdmin;
@@ -40,11 +42,8 @@ public class CheckApService extends IntentService {
 	// wifi连接类
 	private WifiConnect mWifiConnect;
 
-	// 定时刷新列表
-	protected boolean isUpdate = true;
-
 	// 指定的ap是否已连接
-	private boolean isConnectting = false;
+	public static boolean isConnectting = false;
 
 	// 网络信息的监听者
 	private BroadcastReceiver wifiConnectReceiver;
@@ -56,6 +55,34 @@ public class CheckApService extends IntentService {
 	@Override
 	public void onCreate() {
 
+		isStop = false;
+		isConnectting = false;
+		SPECIFY_SSID = (String) SPUtils.get(this, "SPECIFY_SSID", "wanheng");
+		SPECIFY_PWD = (String) SPUtils.get(this, "SPECIFY_PWD",
+				"WANHENGTECH755");
+
+		String type = (String) SPUtils.get(this, "SPECIFY_TYPE",
+				"WIFICIPHER_WPA");
+
+		if (type.equals(WifiConnect.WifiCipherType.WIFICIPHER_WPA.toString())) {
+			SPECIFY_TYPE = WifiConnect.WifiCipherType.WIFICIPHER_WPA;
+		}
+
+		if (type.equals(WifiConnect.WifiCipherType.WIFICIPHER_WEP.toString())) {
+			SPECIFY_TYPE = WifiConnect.WifiCipherType.WIFICIPHER_WEP;
+		}
+
+		if (type.equals(WifiConnect.WifiCipherType.WIFICIPHER_NOPASS.toString())) {
+			SPECIFY_TYPE = WifiConnect.WifiCipherType.WIFICIPHER_NOPASS;
+		}
+
+		if (type.equals(WifiConnect.WifiCipherType.WIFICIPHER_INVALID
+				.toString())) {
+			SPECIFY_TYPE = WifiConnect.WifiCipherType.WIFICIPHER_INVALID;
+		}
+
+		Log.i(TAG, "type==" + type);
+
 		mWifiAdmin = new WifiAdmin(this);
 		mWifiConnect = new WifiConnect(mWifiAdmin.mWifiManager);
 
@@ -64,6 +91,7 @@ public class CheckApService extends IntentService {
 
 		filter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
 		this.registerReceiver(wifiConnectReceiver, filter);
+
 		super.onCreate();
 	}
 
@@ -71,6 +99,8 @@ public class CheckApService extends IntentService {
 	protected void onHandleIntent(Intent intent) {
 
 		while (!isStop) {
+			Log.i("currentSSID", mWifiAdmin.getSSID());
+			Log.i("SPECIFY_SSID", "\"" + SPECIFY_SSID + "\"");
 			getWifiListInfo();
 		}
 
@@ -88,6 +118,7 @@ public class CheckApService extends IntentService {
 				for (ScanResult sr : tmpList) {
 					Log.i(TAG, sr.SSID + isConnectting);
 					if (SPECIFY_SSID.equals(sr.SSID) && !isConnectting) {
+						Log.i(TAG, "连接指定wifi");
 						connectToSpecifyAp();
 					}
 				}
@@ -100,17 +131,17 @@ public class CheckApService extends IntentService {
 
 	// 连接到指定的ap
 	private void connectToSpecifyAp() {
-		Log.i(TAG, "连接指定wifi");
+		Log.i(TAG, SPECIFY_SSID + SPECIFY_PWD + SPECIFY_TYPE);
 		// 连接到指定网络
-		mWifiConnect.connect(SPECIFY_SSID, SPECIFY_PWD, SPECIFY_TYPE);
-		isConnectting = true;
+		if (mWifiAdmin.connect(SPECIFY_SSID, SPECIFY_PWD, SPECIFY_TYPE)) {
+			isConnectting = true;
+		}
 	}
 
 	@Override
 	public void onDestroy() {
 		Log.i(TAG, "onDestroy");
 		isStop = true;
-		isUpdate = false;
 		this.unregisterReceiver(wifiConnectReceiver);
 		super.onDestroy();
 	}
@@ -130,7 +161,9 @@ public class CheckApService extends IntentService {
 					Log.i("SPECIFY_SSID", "\"" + SPECIFY_SSID + "\"");
 					if (!mWifiAdmin.getSSID()
 							.equals("\"" + SPECIFY_SSID + "\"")) {
-
+						if (WifiConnDialog.isConnectting) {
+							return;
+						}
 						isConnectting = false;
 					}
 				}

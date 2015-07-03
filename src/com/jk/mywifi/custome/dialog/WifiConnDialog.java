@@ -10,6 +10,7 @@ import android.text.InputType;
 import android.text.Selection;
 import android.text.TextUtils;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup.LayoutParams;
 import android.view.WindowManager;
@@ -21,6 +22,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.jk.mwifi.R;
+import com.jk.mwifi.service.CheckApService;
 import com.jk.mwifi.wifi.WifiAdmin;
 import com.jk.mwifi.wifi.WifiConnect;
 import com.jk.mwifi.wifi.WifiConnect.WifiCipherType;
@@ -52,6 +54,8 @@ public class WifiConnDialog extends Dialog {
 
 	private TextView txtBtnConn;
 	private TextView txtBtnCancel;
+
+	public static boolean isConnectting = true;
 
 	public WifiConnDialog(Context context, int theme) {
 		super(context, theme);
@@ -122,16 +126,12 @@ public class WifiConnDialog extends Dialog {
 					// 文本正常显示
 					edtPassword
 							.setInputType(InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
-					Editable etable = edtPassword.getText();
-					Selection.setSelection(etable, etable.length());
 
 				} else {
 					// 文本以密码形式显示
 					edtPassword.setInputType(InputType.TYPE_CLASS_TEXT
 							| InputType.TYPE_TEXT_VARIATION_PASSWORD);
 					// 下面两行代码实现: 输入框光标一直在输入文本后面
-					Editable etable = edtPassword.getText();
-					Selection.setSelection(etable, etable.length());
 
 				}
 			}
@@ -149,7 +149,8 @@ public class WifiConnDialog extends Dialog {
 
 			@Override
 			public void onClick(View v) {
-
+				isConnectting = true;
+				CheckApService.isConnectting = true;
 				WifiCipherType type = null;
 				if (scanResult.capabilities.toUpperCase().contains("WPA")) {
 					type = WifiCipherType.WIFICIPHER_WPA;
@@ -162,12 +163,22 @@ public class WifiConnDialog extends Dialog {
 
 				// 连接网络
 				WifiAdmin mWifiAdmin = new WifiAdmin(context);
+
 				WifiConnect wifiConnect = new WifiConnect(
 						mWifiAdmin.mWifiManager);
-				boolean bRet = wifiConnect.connect(scanResult.SSID, edtPassword
-						.getText().toString().trim(), type);
 
+				String pswd = edtPassword.getText().toString().trim();
+				String ssid = scanResult.SSID;
+				Log.i("TAG", ssid);
+				Log.i("TAG", pswd);
+				Log.i("TAG", type + "");
+
+				// boolean bRet = wifiConnect.connect(scanResult.SSID, pswd,
+				// type);
+
+				boolean bRet = mWifiAdmin.connect(scanResult.SSID, pswd, type);
 				if (bRet) {
+
 					showShortToast("连接成功");
 					onNetworkChangeListener.onNetWorkConnect();
 				} else {

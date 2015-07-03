@@ -1,0 +1,72 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/gray"
+    android:orientation="vertical"
+    tools:context="com.jk.mwifi.MainActivity" >
+
+    <EditText
+        android:id="@+id/ap_ssid"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="请输入ap名称" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:gravity="center"
+        android:text="请选择加密类型" />
+
+    <RadioGroup
+        android:id="@+id/gp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:orientation="vertical" >
+
+        <RadioButton
+            android:id="@+id/rbnt1"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="100"
+            android:text="WEP" />
+
+        <RadioButton
+            android:id="@+id/rbnt2"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="100"
+            android:text="WPA" />
+
+        <RadioButton
+            android:id="@+id/rbnt3"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="100"
+            android:text="NOPASS" />
+
+        <RadioButton
+            android:id="@+id/rbnt4"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="100"
+            android:text="INVALID" />
+    </RadioGroup>
+
+    <EditText
+        android:id="@+id/ap_pswd"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:hint="请输入ap密码" />
+
+    <Button
+        android:id="@+id/confire"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:text="确认" />
+
+</LinearLayout>
